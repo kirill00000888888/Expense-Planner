@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>💰 Budget Planner Ultra v2</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <div class="card">
+      <h2>💰 Budget Planner Ultra v2</h2>
+
+      <input id="title" placeholder="Название (например: Продукты)" />
+      <input id="amount" type="number" placeholder="Сумма" />
+      <select id="type">
+        <option value="income">Доход</option>
+        <option value="expense">Расход</option>
+      </select>
+      <input id="category" placeholder="Категория (например: Еда)" />
+      <input id="date" type="date" />
+      <button onclick="addTransaction()">Добавить</button>
+      <button onclick="clearAll()" class="delete-all-btn">
+        Очистить все данные
+      </button>
+
+      <div class="filters">
+        <label>Показать за:</label>
+        <select id="filter" onchange="render()">
+          <option value="all">Всё время</option>
+          <option value="month">Этот месяц</option>
+          <option value="today">Сегодня</option>
+        </select>
+      </div>
+
+      <input
+        id="searchBox"
+        placeholder="🔍 Поиск по названию или категории..."
+        oninput="render()"
+      />
+
+      <div id="balance">Баланс: 0 ₽</div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Дата</th>
+            <th>Название</th>
+            <th>Категория</th>
+            <th>Сумма</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="list"></tbody>
+      </table>
+    </div>
+
+    <div id="chartContainer">
+      <h3>📊 Расходы по категориям</h3>
+      <div class="chart-wrapper"><canvas id="chart"></canvas></div>
+    </div>
+
+    <div id="chartBarContainer">
+      <h3>📈 Доходы и расходы по месяцам</h3>
+      <div class="chart-wrapper"><canvas id="chartBar"></canvas></div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

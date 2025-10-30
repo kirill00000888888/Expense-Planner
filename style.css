@@ -1,0 +1,125 @@
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: #f0f3f6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 30px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 540px;
+  margin-bottom: 20px;
+}
+
+input,
+select,
+button {
+  padding: 8px;
+  font-size: 16px;
+  margin: 5px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+button {
+  background: #2b90d9;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: #1f7cc2;
+}
+
+.delete-all-btn {
+  background: crimson;
+}
+.delete-all-btn:hover {
+  background: #b22222;
+}
+
+h2,
+h3 {
+  text-align: center;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+th,
+td {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.income {
+  color: green;
+}
+.expense {
+  color: crimson;
+}
+
+#balance {
+  font-size: 20px;
+  margin-top: 10px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.delete-btn {
+  background: crimson;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.delete-btn:hover {
+  opacity: 0.8;
+}
+
+.filters {
+  text-align: center;
+  margin-top: 10px;
+}
+
+#chartContainer,
+#chartBarContainer {
+  background: #fff;
+  padding: 20px;
+  border-radius: 16px;
+  width: 540px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.chart-wrapper {
+  position: relative;
+  height: 300px; /* фиксированная высота для графика */
+  width: 100%;
+}
+
+canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+#searchBox {
+  width: 95%;
+  margin: 10px auto;
+  display: block;
+  padding: 8px;
+  border: 1px solid #aaa;
+  border-radius: 6px;
+}
