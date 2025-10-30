@@ -97,7 +97,7 @@ function render() {
 }
 
 function drawCharts(data) {
-  // 1️⃣ Pie chart — Расходы по категориям
+  // 1️⃣ Pie chart — Расходы по категориям (ИСПРАВЛЕНО!)
   const categories = {};
   data.forEach((t) => {
     if (t.type === "expense") {
@@ -108,9 +108,36 @@ function drawCharts(data) {
   const ctxPie = document.getElementById("chart").getContext("2d");
   if (chartPie) chartPie.destroy();
 
-  chartPie = new Chart(ctxPie, {
-    type: "pie",
-    data: {
+  // 🔥 ИСПРАВЛЕНИЕ: если нет расходов, показываем пустую диаграмму с текстом
+  let pieData, pieOptions;
+  if (Object.keys(categories).length === 0) {
+    pieData = {
+      labels: ["Нет данных"],
+      datasets: [
+        {
+          data: [1],
+          backgroundColor: ["#f8f9fa"],
+          borderWidth: 0,
+        },
+      ],
+    };
+    pieOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: "bottom",
+        },
+        tooltip: { enabled: false },
+        title: {
+          display: true,
+          text: "Нет расходов",
+        },
+      },
+    };
+  } else {
+    pieData = {
       labels: Object.keys(categories),
       datasets: [
         {
@@ -125,15 +152,21 @@ function drawCharts(data) {
           ],
         },
       ],
-    },
-    options: {
+    };
+    pieOptions = {
       responsive: true,
       maintainAspectRatio: false,
       plugins: { legend: { position: "bottom" } },
-    },
+    };
+  }
+
+  chartPie = new Chart(ctxPie, {
+    type: "pie",
+    data: pieData,
+    options: pieOptions,
   });
 
-  // 2️⃣ Bar chart — Доходы и расходы по месяцам
+  // 2️⃣ Bar chart — без изменений (он работал)
   const months = {};
   data.forEach((t) => {
     const [year, month] = t.date.split("-");
