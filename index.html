@@ -3,176 +3,88 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Budget Planner Ultra v6</title>
-
-    <!-- PWA -->
-    <link rel="manifest" href="manifest.json" />
-    <link rel="icon" href="icon-192.png" type="image/png" />
-    <meta name="theme-color" content="#2b90d9" />
-
-    <!-- Chart.js (CDN с fallback) -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
+    <title>💰 Budget Planner Ultra v3</title>
     <link rel="stylesheet" href="style.css" />
+    <link rel="manifest" href="manifest.json" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
   </head>
   <body>
-    <div class="container">
-      <!-- КНОПКА УСТАНОВКИ -->
-      <button id="install-btn" style="display: none">
-        Установить приложение
+    <div class="card">
+      <h2>💰 Budget Planner Ultra v3</h2>
+
+      <input id="title" placeholder="Название (например: Продукты)" />
+      <input id="amount" type="number" placeholder="Сумма" />
+
+      <select id="type">
+        <option value="income">Доход</option>
+        <option value="expense">Расход</option>
+      </select>
+
+      <select id="category">
+        <option value="Еда">🍔 Еда</option>
+        <option value="Транспорт">🚗 Транспорт</option>
+        <option value="Жильё">🏠 Жильё</option>
+        <option value="Покупки">🛍 Покупки</option>
+        <option value="Развлечения">🎮 Развлечения</option>
+        <option value="Коммунальные">💡 Коммунальные</option>
+        <option value="Здоровье">💊 Здоровье</option>
+        <option value="Учёба">🎓 Учёба</option>
+        <option value="Путешествия">🧳 Путешествия</option>
+        <option value="Прочее">📦 Прочее</option>
+      </select>
+
+      <input id="date" type="date" />
+      <button onclick="addTransaction()">Добавить</button>
+      <button onclick="clearAll()" class="delete-all-btn">
+        Очистить все данные
       </button>
 
-      <div class="card">
-        <h2>Budget Planner Ultra v6</h2>
-
-        <div class="input-group">
-          <input type="text" id="title" placeholder="Название" />
-          <input type="number" id="amount" placeholder="Сумма" step="1" />
-          <select id="type">
-            <option value="income">Доход</option>
-            <option value="expense">Расход</option>
-          </select>
-          <select id="category">
-            <option value="">Без категории</option>
-            <option value="Еда">Еда</option>
-            <option value="Транспорт">Транспорт</option>
-            <option value="Развлечения">Развлечения</option>
-            <option value="Зарплата">Зарплата</option>
-            <option value="Прочее">Прочее</option>
-          </select>
-          <input type="date" id="date" />
-        </div>
-
-        <div class="btn-group">
-          <button class="btn-primary" onclick="addTransaction()">
-            Добавить
-          </button>
-          <button class="btn-success" onclick="exportCSV()">Экспорт CSV</button>
-          <label class="btn-secondary">
-            Импорт CSV
-            <input type="file" accept=".csv" onchange="importCSV(event)" />
-          </label>
-          <button class="btn-danger" onclick="clearAll()">Очистить всё</button>
-        </div>
-
-        <div class="controls">
-          <div class="filter-group">
-            <label for="filter">Фильтр:</label>
-            <select id="filter" onchange="render()">
-              <option value="all">Все</option>
-              <option value="today">Сегодня</option>
-              <option value="month">Этот месяц</option>
-            </select>
-          </div>
-          <input
-            type="text"
-            id="searchBox"
-            placeholder="Поиск..."
-            oninput="render()"
-          />
-        </div>
-
-        <div id="balance">Баланс: 0 ₽</div>
-        <div id="summary"></div>
-
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>Дата</th>
-                <th>Название</th>
-                <th>Категория</th>
-                <th>Сумма</th>
-                <th>Действия</th>
-              </tr>
-            </thead>
-            <tbody id="list"></tbody>
-          </table>
-        </div>
+      <div class="filters">
+        <label>Показать за:</label>
+        <select id="filter" onchange="render()">
+          <option value="all">Всё время</option>
+          <option value="month">Этот месяц</option>
+          <option value="today">Сегодня</option>
+        </select>
       </div>
 
-      <div class="charts-grid">
-        <div class="chart-card">
-          <h3>Расходы по категориям</h3>
-          <canvas id="chart"></canvas>
-        </div>
-        <div class="chart-card">
-          <h3>Доходы/Расходы по месяцам</h3>
-          <canvas id="chartBar"></canvas>
-        </div>
-        <div class="chart-card">
-          <h3>Тренд баланса</h3>
-          <canvas id="chartLine"></canvas>
-        </div>
-      </div>
+      <input
+        id="searchBox"
+        placeholder="🔍 Поиск по названию или категории..."
+        oninput="render()"
+      />
+
+      <div id="balance">Баланс: 0 ₽</div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Дата</th>
+            <th>Название</th>
+            <th>Категория</th>
+            <th>Сумма</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="list"></tbody>
+      </table>
     </div>
 
-    <!-- Модалка -->
-    <div id="editModal" class="modal" style="display: none">
-      <div class="modal-content">
-        <h3>Редактировать</h3>
-        <input type="text" id="editTitle" />
-        <input type="number" id="editAmount" step="1" />
-        <select id="editType">
-          <option value="income">Доход</option>
-          <option value="expense">Расход</option>
-        </select>
-        <select id="editCategory">
-          <option value="">Без категории</option>
-          <option value="Еда">Еда</option>
-          <option value="Транспорт">Транспорт</option>
-          <option value="Развлечения">Развлечения</option>
-          <option value="Зарплата">Зарплата</option>
-          <option value="Прочее">Прочее</option>
-        </select>
-        <input type="date" id="editDate" />
-        <div class="modal-buttons">
-          <button class="btn-primary" onclick="saveEdit()">Сохранить</button>
-          <button class="btn-secondary" onclick="closeModal()">Отмена</button>
-        </div>
-      </div>
+    <div id="chartContainer">
+      <h3>📊 Расходы по категориям</h3>
+      <div class="chart-wrapper"><canvas id="chart"></canvas></div>
     </div>
 
-    <!-- Service Worker + PWA -->
+    <div id="chartBarContainer">
+      <h3>📈 Доходы и расходы по месяцам</h3>
+      <div class="chart-wrapper"><canvas id="chartBar"></canvas></div>
+    </div>
+
+    <script src="script.js"></script>
     <script>
-      // === PWA УСТАНОВКА ===
-      let deferredPrompt;
-      const installBtn = document.getElementById("install-btn");
-
-      window.addEventListener("beforeinstallprompt", (e) => {
-        console.log("PWA: beforeinstallprompt сработал");
-        e.preventDefault();
-        deferredPrompt = e;
-        installBtn.style.display = "block";
-      });
-
-      installBtn.addEventListener("click", () => {
-        installBtn.style.display = "none";
-        if (!deferredPrompt) {
-          alert("Установка недоступна. Попробуй позже.");
-          return;
-        }
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choice) => {
-          if (choice.outcome === "accepted") {
-            console.log("PWA установлено");
-          } else {
-            console.log("PWA отклонено");
-          }
-          deferredPrompt = null;
-        });
-      });
-
-      // === Service Worker ===
       if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker
-            .register("sw.js")
-            .then((reg) => console.log("SW зарегистрирован:", reg))
-            .catch((err) => console.log("SW ошибка:", err));
-        });
+        navigator.serviceWorker.register("service-worker.js");
       }
     </script>
-    <script src="script.js"></script>
   </body>
 </html>

@@ -1,202 +1,184 @@
 let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-let chartPie = null,
-  chartBar = null,
-  chartLine = null;
-let editingId = null;
+let chartPie, chartBar;
 
-render();
+function saveData() {
+  localStorage.setItem("transactions", JSON.stringify(transactions));
+}
 
-// === ДОБАВИТЬ ТРАНЗАКЦИЮ ===
 function addTransaction() {
   const title = document.getElementById("title").value.trim();
   const amount = parseFloat(document.getElementById("amount").value);
   const type = document.getElementById("type").value;
-  const category = document.getElementById("category").value || "Без категории";
+  const category = document.getElementById("category").value;
   const date =
     document.getElementById("date").value ||
     new Date().toISOString().slice(0, 10);
 
-  if (!title || isNaN(amount) || amount <= 0) {
-    alert("Введите корректные данные");
+  if (!title || !amount) {
+    alert("Введите название и сумму!");
     return;
   }
 
   transactions.push({ id: Date.now(), title, amount, type, category, date });
-  localStorage.setItem("transactions", JSON.stringify(transactions));
-  clearForm();
+  saveData();
+  clearInputs();
   render();
 }
 
-function clearForm() {
+function clearInputs() {
   document.getElementById("title").value = "";
   document.getElementById("amount").value = "";
-  document.getElementById("category").value = "";
-  document.getElementById("date").value = "";
-}
-
-// === РЕДАКТИРОВАНИЕ, УДАЛЕНИЕ, ОЧИСТКА ===
-function editTransaction(id) {
-  const t = transactions.find((x) => x.id === id);
-  if (!t) return;
-  editingId = id;
-  document.getElementById("editTitle").value = t.title;
-  document.getElementById("editAmount").value = t.amount;
-  document.getElementById("editType").value = t.type;
-  document.getElementById("editCategory").value = t.category;
-  document.getElementById("editDate").value = t.date;
-  document.getElementById("editModal").style.display = "flex";
-}
-
-function saveEdit() {
-  const title = document.getElementById("editTitle").value.trim();
-  const amount = parseFloat(document.getElementById("editAmount").value);
-  const type = document.getElementById("editType").value;
-  const category =
-    document.getElementById("editCategory").value || "Без категории";
-  const date = document.getElementById("editDate").value;
-
-  if (!title || isNaN(amount) || amount <= 0) return alert("Ошибка");
-
-  const idx = transactions.findIndex((t) => t.id === editingId);
-  if (idx !== -1) {
-    transactions[idx] = { id: editingId, title, amount, type, category, date };
-    localStorage.setItem("transactions", JSON.stringify(transactions));
-    closeModal();
-    render();
-  }
-}
-
-function closeModal() {
-  document.getElementById("editModal").style.display = "none";
-  editingId = null;
 }
 
 function deleteTransaction(id) {
-  if (confirm("Удалить?")) {
-    transactions = transactions.filter((t) => t.id !== id);
-    localStorage.setItem("transactions", JSON.stringify(transactions));
-    render();
-  }
+  transactions = transactions.filter((t) => t.id !== id);
+  saveData();
+  render();
 }
 
 function clearAll() {
-  if (confirm("Удалить ВСЁ?")) {
+  if (confirm("Удалить все данные?")) {
     transactions = [];
-    localStorage.removeItem("transactions");
+    saveData();
     render();
   }
 }
 
-// === ФИЛЬТР ===
-function filterData() {
+function getFilteredTransactions() {
   const filter = document.getElementById("filter").value;
   const search = document.getElementById("searchBox").value.toLowerCase();
-  const today = new Date();
+  const now = new Date();
 
-  return transactions
-    .filter((t) => {
+  return transactions.filter((t) => {
+    const matchSearch =
+      t.title.toLowerCase().includes(search) ||
+      t.category.toLowerCase().includes(search);
+
+    if (filter === "today") {
+      return matchSearch && t.date === now.toISOString().slice(0, 10);
+    } else if (filter === "month") {
+      const [year, month] = [now.getFullYear(), now.getMonth()];
       const d = new Date(t.date);
-      let ok = true;
-      if (filter === "today") ok = d.toDateString() === today.toDateString();
-      if (filter === "month")
-        ok =
-          d.getMonth() === today.getMonth() &&
-          d.getFullYear() === today.getFullYear();
-      const match =
-        t.title.toLowerCase().includes(search) ||
-        t.category.toLowerCase().includes(search);
-      return ok && match;
-    })
-    .sort((a, b) => new Date(b.date) - new Date(a.date));
+      return matchSearch && d.getFullYear() === year && d.getMonth() === month;
+    }
+    return matchSearch;
+  });
 }
 
-// === РЕНДЕР ===
 function render() {
-  const data = filterData();
   const list = document.getElementById("list");
+  const filtered = getFilteredTransactions();
   list.innerHTML = "";
 
-  let income = 0,
-    expense = 0;
-  data.forEach((t) => {
-    const sign = t.type === "income" ? "+" : "-";
-    const cls = t.type === "income" ? "income" : "expense";
+  let balance = 0;
+
+  filtered.forEach((t) => {
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${t.date}</td>
       <td>${t.title}</td>
       <td>${t.category}</td>
-      <td class="${cls}">${sign}${t.amount.toFixed(0)} ₽</td>
-      <td class="actions">
-        <button class="edit-btn" onclick="editTransaction(${
-          t.id
-        })">Ред.</button>
-        <button class="delete-btn" onclick="deleteTransaction(${
-          t.id
-        })">×</button>
-      </td>
+      <td class="${t.type}">${t.type === "income" ? "+" : "-"}${t.amount} ₽</td>
+      <td><button class="delete-btn" onclick="deleteTransaction(${
+        t.id
+      })">✖</button></td>
     `;
     list.appendChild(row);
-    if (t.type === "income") income += t.amount;
-    else expense += t.amount;
+
+    balance += t.type === "income" ? t.amount : -t.amount;
   });
 
-  const total = income - expense;
-  document.getElementById(
-    "balance"
-  ).innerHTML = `Баланс: <strong style="color:${
-    total >= 0 ? "#27ae60" : "#e74c3c"
-  }">${total.toFixed(0)} ₽</strong>`;
-  document.getElementById(
-    "summary"
-  ).innerHTML = `Доходы: <span style="color:#27ae60">+${income.toFixed(
-    0
-  )}</span> ₽ | Расходы: <span style="color:#e74c3c">-${expense.toFixed(
-    0
-  )}</span> ₽`;
+  document.getElementById("balance").textContent = `Баланс: ${balance.toFixed(
+    2
+  )} ₽`;
 
-  drawCharts(data);
+  renderCharts(filtered);
 }
 
-// === ДИАГРАММЫ (РАБОТАЮТ ОФФЛАЙН) ===
-function drawCharts(data) {
-  // Круговая
-  const cats = {};
-  data.forEach((t) => {
-    if (t.type === "expense")
-      cats[t.category] = (cats[t.category] || 0) + t.amount;
-  });
-
-  const ctxPie = document.getElementById("chart").getContext("2d");
+function renderCharts(data) {
+  // ✅ Уничтожаем старые графики, чтобы не дублировались
   if (chartPie) chartPie.destroy();
-  chartPie = new Chart(ctxPie, {
-    type: "pie",
-    data: {
-      labels: Object.keys(cats).length ? Object.keys(cats) : ["Нет расходов"],
-      datasets: [
-        {
-          data: Object.keys(cats).length ? Object.values(cats) : [1],
-          backgroundColor: Object.keys(cats).length
-            ? ["#e74c3c", "#3498db", "#f39c12", "#27ae60", "#9b59b6"]
-            : ["#ecf0f1"],
-        },
-      ],
-    },
-    options: { responsive: true, plugins: { legend: { position: "bottom" } } },
+  if (chartBar) chartBar.destroy();
+
+  const ctxPie = document.getElementById("chart");
+  const ctxBar = document.getElementById("chartBar");
+
+  if (!ctxPie || !ctxBar) return;
+
+  // --- Диаграмма расходов по категориям ---
+  const categories = {};
+  data
+    .filter((t) => t.type === "expense")
+    .forEach((t) => {
+      categories[t.category] = (categories[t.category] || 0) + t.amount;
+    });
+
+  if (Object.keys(categories).length) {
+    chartPie = new Chart(ctxPie, {
+      type: "pie",
+      data: {
+        labels: Object.keys(categories),
+        datasets: [
+          {
+            data: Object.values(categories),
+            backgroundColor: [
+              "#FF6384",
+              "#36A2EB",
+              "#FFCE56",
+              "#4BC0C0",
+              "#9966FF",
+              "#FF9F40",
+              "#B0E57C",
+              "#F778A1",
+              "#C71585",
+              "#4682B4",
+              "#FFD700",
+              "#8B0000",
+            ],
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: "bottom" } },
+      },
+    });
+  }
+
+  // --- Диаграмма доходов/расходов по месяцам ---
+  const months = {};
+  data.forEach((t) => {
+    const d = new Date(t.date);
+    const key = `${d.getFullYear()}-${d.getMonth() + 1}`;
+    if (!months[key]) months[key] = { income: 0, expense: 0 };
+    months[key][t.type] += t.amount;
   });
 
-  // Остальные диаграммы — аналогично (твой код)
-  // ... (вставь свои chartBar и chartLine)
+  if (Object.keys(months).length) {
+    chartBar = new Chart(ctxBar, {
+      type: "bar",
+      data: {
+        labels: Object.keys(months),
+        datasets: [
+          {
+            label: "Доходы",
+            data: Object.values(months).map((m) => m.income),
+            backgroundColor: "#36A2EB",
+          },
+          {
+            label: "Расходы",
+            data: Object.values(months).map((m) => m.expense),
+            backgroundColor: "#FF6384",
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        scales: { y: { beginAtZero: true } },
+        plugins: { legend: { position: "bottom" } },
+      },
+    });
+  }
 }
 
-// === CSV ===
-function exportCSV() {
-  /* твой код */
-}
-function importCSV(e) {
-  /* твой код с фиксом кавычек */
-}
-
-window.onclick = (e) => {
-  if (e.target === document.getElementById("editModal")) closeModal();
-};
+document.addEventListener("DOMContentLoaded", render);
