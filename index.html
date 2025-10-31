@@ -4,72 +4,62 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Budget Planner Ultra v6</title>
-    <link rel="stylesheet" href="style.css" />
+
+    <!-- PWA -->
     <link rel="manifest" href="manifest.json" />
     <link rel="icon" href="icon-192.png" type="image/png" />
     <meta name="theme-color" content="#2b90d9" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 
-    <!-- PWA: ПУТЬ ПОД ТВОЙ РЕПОЗИТОРИЙ -->
-    <link rel="manifest" href="/Expense-Planner/manifest.json" />
-    <link rel="icon" href="/Expense-Planner/icon-192.png" type="image/png" />
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Стили -->
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <div class="container">
+      <!-- Кнопка установки -->
+      <button id="install-btn">Установить приложение</button>
+
       <div class="card">
         <h2>Budget Planner Ultra v6</h2>
 
         <div class="input-group">
-          <input id="title" placeholder="Название транзакции" />
-          <input id="amount" type="number" placeholder="Сумма" />
+          <input type="text" id="title" placeholder="Название" />
+          <input type="number" id="amount" placeholder="Сумма" step="1" />
           <select id="type">
             <option value="income">Доход</option>
             <option value="expense">Расход</option>
           </select>
-          <select id="category">
-            <option value="">Категория</option>
-            <option value="Зарплата">Зарплата</option>
-            <option value="Фриланс">Фриланс</option>
-            <option value="Еда">Еда</option>
-            <option value="Транспорт">Транспорт</option>
-            <option value="Развлечения">Развлечения</option>
-            <option value="Коммуналка">Коммуналка</option>
-            <option value="Здоровье">Здоровье</option>
-            <option value="Прочее">Прочее</option>
-          </select>
-          <input id="date" type="date" />
+          <input type="text" id="category" placeholder="Категория" />
+          <input type="date" id="date" />
         </div>
 
         <div class="btn-group">
-          <button onclick="addTransaction()" class="btn-primary">
+          <button class="btn-primary" onclick="addTransaction()">
             Добавить
           </button>
-          <button onclick="clearAll()" class="btn-danger">Очистить всё</button>
-          <button onclick="exportCSV()" class="btn-success">Экспорт CSV</button>
+          <button class="btn-success" onclick="exportCSV()">Экспорт CSV</button>
           <label class="btn-secondary">
             Импорт CSV
-            <input
-              type="file"
-              id="importFile"
-              accept=".csv"
-              onchange="importCSV(event)"
-              hidden
-            />
+            <input type="file" accept=".csv" onchange="importCSV(event)" />
           </label>
+          <button class="btn-danger" onclick="clearAll()">Очистить всё</button>
         </div>
 
         <div class="controls">
           <div class="filter-group">
-            <label>Фильтр:</label>
+            <label for="filter">Фильтр:</label>
             <select id="filter" onchange="render()">
-              <option value="all">Всё время</option>
-              <option value="month">Этот месяц</option>
+              <option value="all">Все</option>
               <option value="today">Сегодня</option>
+              <option value="month">Этот месяц</option>
             </select>
           </div>
           <input
+            type="text"
             id="searchBox"
-            placeholder="Поиск по названию или категории..."
+            placeholder="Поиск..."
             oninput="render()"
           />
         </div>
@@ -99,7 +89,7 @@
           <canvas id="chart"></canvas>
         </div>
         <div class="chart-card">
-          <h3>Доходы и расходы</h3>
+          <h3>Доходы/Расходы по месяцам</h3>
           <canvas id="chartBar"></canvas>
         </div>
         <div class="chart-card">
@@ -109,42 +99,36 @@
       </div>
     </div>
 
-    <!-- Модальное окно редактирования -->
+    <!-- Модалка редактирования -->
     <div id="editModal" class="modal">
       <div class="modal-content">
         <h3>Редактировать транзакцию</h3>
-        <input id="editTitle" placeholder="Название" />
-        <input id="editAmount" type="number" placeholder="Сумма" />
+        <input type="text" id="editTitle" placeholder="Название" />
+        <input type="number" id="editAmount" placeholder="Сумма" step="1" />
         <select id="editType">
           <option value="income">Доход</option>
           <option value="expense">Расход</option>
         </select>
-        <select id="editCategory">
-          <option value="">Категория</option>
-          <option value="Зарплата">Зарплата</option>
-          <option value="Фриланс">Фриланс</option>
-          <option value="Еда">Еда</option>
-          <option value="Транспорт">Транспорт</option>
-          <option value="Развлечения">Развлечения</option>
-          <option value="Коммуналка">Коммуналка</option>
-          <option value="Здоровье">Здоровье</option>
-          <option value="Прочее">Прочее</option>
-        </select>
-        <input id="editDate" type="date" />
+        <input type="text" id="editCategory" placeholder="Категория" />
+        <input type="date" id="editDate" />
         <div class="modal-buttons">
-          <button onclick="saveEdit()" class="btn-success">Сохранить</button>
-          <button onclick="closeModal()" class="btn-secondary">Отмена</button>
+          <button class="btn-primary" onclick="saveEdit()">Сохранить</button>
+          <button class="btn-secondary" onclick="closeModal()">Отмена</button>
         </div>
       </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Service Worker -->
     <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
-          navigator.serviceWorker.register("sw.js");
+          navigator.serviceWorker
+            .register("sw.js")
+            .then((reg) => console.log("SW registered"))
+            .catch((err) => console.log("SW error:", err));
         });
       }
     </script>
+    <script src="script.js"></script>
   </body>
 </html>

@@ -1,4 +1,4 @@
-const CACHE = "budget-v6.1";
+const CACHE = "budget-v6.3";
 const FILES_TO_CACHE = [
   "/Expense-Planner/",
   "/Expense-Planner/index.html",
@@ -7,6 +7,7 @@ const FILES_TO_CACHE = [
   "/Expense-Planner/manifest.json",
   "/Expense-Planner/icon-192.png",
   "/Expense-Planner/icon-512.png",
+  "https://cdn.jsdelivr.net/npm/chart.js",
 ];
 
 self.addEventListener("install", (e) => {
