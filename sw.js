@@ -1,40 +1,32 @@
-const CACHE = "budget-v6.3";
-const FILES_TO_CACHE = [
-  "/Expense-Planner/",
-  "/Expense-Planner/index.html",
-  "/Expense-Planner/style.css",
-  "/Expense-Planner/script.js",
-  "/Expense-Planner/manifest.json",
-  "/Expense-Planner/icon-192.png",
-  "/Expense-Planner/icon-512.png",
-  "https://cdn.jsdelivr.net/npm/chart.js",
+const CACHE = "budget-v6.4";
+const FILES = [
+  "/",
+  "/index.html",
+  "/style.css",
+  "/script.js",
+  "/manifest.json",
+  "/icon-192.png",
+  "/icon-512.png",
+  "https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js",
 ];
 
 self.addEventListener("install", (e) => {
-  e.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(FILES_TO_CACHE)));
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(FILES)));
   self.skipWaiting();
 });
 
 self.addEventListener("fetch", (e) => {
-  e.respondWith(
-    caches.match(e.request).then((res) => {
-      if (res) return res;
-      return fetch(e.request).catch(() => {
-        return caches.match("/Expense-Planner/index.html");
-      });
-    })
-  );
+  e.respondWith(caches.match(e.request).then((r) => r || fetch(e.request)));
 });
 
 self.addEventListener("activate", (e) => {
   e.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cache) => {
-          if (cache !== CACHE) return caches.delete(cache);
-        })
-      );
-    })
+    caches
+      .keys()
+      .then((keys) =>
+        Promise.all(
+          keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))
+        )
+      )
   );
-  self.clients.claim();
 });
