@@ -1,19 +1,20 @@
 {
-  "name": "Budget Planner Ultra",
+  "name": "Budget Planner Ultra v6",
   "short_name": "Budget",
-  "description": "Умный трекер бюджета",
-  "start_url": "/",
+  "description": "Умный трекер бюджета с графиками и PWA",
+  "start_url": "/Expense-Planner/",
+  "scope": "/Expense-Planner/",
   "display": "standalone",
-  "background_color": "#f5f7fa",
+  "background_color": "#f4f6f9",
   "theme_color": "#2b90d9",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "/Expense-Planner/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "icon-512.png",
+      "src": "/Expense-Planner/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
