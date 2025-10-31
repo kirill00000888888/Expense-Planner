@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="ru">
   <head>
+    <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>💰 Budget Planner Ultra v3</title>
+    <title>Budget Planner Ultra v3</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="manifest" href="manifest.json" />
+    <link rel="icon" href="/icons/icon-192.jpg" type="image/jpeg" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.jpg" />
+    <meta name="theme-color" content="#2b90d9" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
   </head>
   <body>
     <div class="card">
-      <h2>💰 Budget Planner Ultra v3</h2>
+      <h2>Budget Planner Ultra v3</h2>
 
       <input id="title" placeholder="Название (например: Продукты)" />
       <input id="amount" type="number" placeholder="Сумма" />
@@ -21,18 +25,17 @@
       </select>
 
       <select id="category">
-        <option value="Еда">🍔 Еда</option>
-        <option value="Транспорт">🚗 Транспорт</option>
+        <option value="Еда">🍎 Еда</option>
+        <option value="Транспорт">🚌 Транспорт</option>
         <option value="Жильё">🏠 Жильё</option>
-        <option value="Покупки">🛍 Покупки</option>
-        <option value="Развлечения">🎮 Развлечения</option>
+        <option value="Покупки">🛍️ Покупки</option>
+        <option value="Развлечения">🎬 Развлечения</option>
         <option value="Коммунальные">💡 Коммунальные</option>
-        <option value="Здоровье">💊 Здоровье</option>
-        <option value="Учёба">🎓 Учёба</option>
-        <option value="Путешествия">🧳 Путешествия</option>
-        <option value="Прочее">📦 Прочее</option>
+        <option value="Здоровье">🏥 Здоровье</option>
+        <option value="Учёба">📚 Учёба</option>
+        <option value="Путешествия">✈️ Путешествия</option>
+        <option value="Прочее">🤷 Прочее</option>
       </select>
-
       <input id="date" type="date" />
       <button onclick="addTransaction()">Добавить</button>
       <button onclick="clearAll()" class="delete-all-btn">
@@ -50,7 +53,7 @@
 
       <input
         id="searchBox"
-        placeholder="🔍 Поиск по названию или категории..."
+        placeholder="Поиск по названию или категории..."
         oninput="render()"
       />
 
@@ -71,20 +74,26 @@
     </div>
 
     <div id="chartContainer">
-      <h3>📊 Расходы по категориям</h3>
-      <div class="chart-wrapper"><canvas id="chart"></canvas></div>
+      <h3>Расходы по категориям</h3>
+      <div class="chart-wrapper">
+        <canvas id="chart" width="400" height="300"></canvas>
+      </div>
     </div>
 
     <div id="chartBarContainer">
-      <h3>📈 Доходы и расходы по месяцам</h3>
-      <div class="chart-wrapper"><canvas id="chartBar"></canvas></div>
+      <h3>Доходы и расходы по месяцам</h3>
+      <div class="chart-wrapper">
+        <canvas id="chartBar" width="400" height="300"></canvas>
+      </div>
+    </div>
+
+    <div
+      id="installContainer"
+      style="display: none; text-align: center; margin: 20px"
+    >
+      <button id="installBtn">Установить приложение</button>
     </div>
 
     <script src="script.js"></script>
-    <script>
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("service-worker.js");
-      }
-    </script>
   </body>
 </html>

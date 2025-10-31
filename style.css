@@ -115,9 +115,11 @@ td {
   width: 100%;
 }
 
+/* УБРАНО !important — теперь графики чёткие */
 canvas {
-  width: 100% !important;
-  height: 100% !important;
+  max-width: 100%;
+  height: auto !important;
+  width: auto !important;
 }
 
 #searchBox {
@@ -127,4 +129,17 @@ canvas {
   padding: 8px;
   border: 1px solid #aaa;
   border-radius: 6px;
+}
+
+#installBtn {
+  padding: 12px 24px;
+  font-size: 16px;
+  background: #2b90d9;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+#installBtn:hover {
+  background: #1f7cc2;
 }
