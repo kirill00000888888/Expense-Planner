@@ -3,68 +3,144 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>💰 Budget Planner Ultra v2</title>
+    <title>Budget Planner Ultra v6</title>
     <link rel="stylesheet" href="style.css" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="icon" href="icon-192.png" type="image/png" />
+    <meta name="theme-color" content="#2b90d9" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
   </head>
   <body>
-    <div class="card">
-      <h2>💰 Budget Planner Ultra v2</h2>
+    <div class="container">
+      <div class="card">
+        <h2>Budget Planner Ultra v6</h2>
 
-      <input id="title" placeholder="Название (например: Продукты)" />
-      <input id="amount" type="number" placeholder="Сумма" />
-      <select id="type">
-        <option value="income">Доход</option>
-        <option value="expense">Расход</option>
-      </select>
-      <input id="category" placeholder="Категория (например: Еда)" />
-      <input id="date" type="date" />
-      <button onclick="addTransaction()">Добавить</button>
-      <button onclick="clearAll()" class="delete-all-btn">
-        Очистить все данные
-      </button>
+        <div class="input-group">
+          <input id="title" placeholder="Название транзакции" />
+          <input id="amount" type="number" placeholder="Сумма" />
+          <select id="type">
+            <option value="income">Доход</option>
+            <option value="expense">Расход</option>
+          </select>
+          <select id="category">
+            <option value="">Категория</option>
+            <option value="Зарплата">Зарплата</option>
+            <option value="Фриланс">Фриланс</option>
+            <option value="Еда">Еда</option>
+            <option value="Транспорт">Транспорт</option>
+            <option value="Развлечения">Развлечения</option>
+            <option value="Коммуналка">Коммуналка</option>
+            <option value="Здоровье">Здоровье</option>
+            <option value="Прочее">Прочее</option>
+          </select>
+          <input id="date" type="date" />
+        </div>
 
-      <div class="filters">
-        <label>Показать за:</label>
-        <select id="filter" onchange="render()">
-          <option value="all">Всё время</option>
-          <option value="month">Этот месяц</option>
-          <option value="today">Сегодня</option>
-        </select>
+        <div class="btn-group">
+          <button onclick="addTransaction()" class="btn-primary">
+            Добавить
+          </button>
+          <button onclick="clearAll()" class="btn-danger">Очистить всё</button>
+          <button onclick="exportCSV()" class="btn-success">Экспорт CSV</button>
+          <label class="btn-secondary">
+            Импорт CSV
+            <input
+              type="file"
+              id="importFile"
+              accept=".csv"
+              onchange="importCSV(event)"
+              hidden
+            />
+          </label>
+        </div>
+
+        <div class="controls">
+          <div class="filter-group">
+            <label>Фильтр:</label>
+            <select id="filter" onchange="render()">
+              <option value="all">Всё время</option>
+              <option value="month">Этот месяц</option>
+              <option value="today">Сегодня</option>
+            </select>
+          </div>
+          <input
+            id="searchBox"
+            placeholder="Поиск по названию или категории..."
+            oninput="render()"
+          />
+        </div>
+
+        <div id="balance">Баланс: 0 ₽</div>
+        <div id="summary"></div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Дата</th>
+                <th>Название</th>
+                <th>Категория</th>
+                <th>Сумма</th>
+                <th>Действия</th>
+              </tr>
+            </thead>
+            <tbody id="list"></tbody>
+          </table>
+        </div>
       </div>
 
-      <input
-        id="searchBox"
-        placeholder="🔍 Поиск по названию или категории..."
-        oninput="render()"
-      />
-
-      <div id="balance">Баланс: 0 ₽</div>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Дата</th>
-            <th>Название</th>
-            <th>Категория</th>
-            <th>Сумма</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="list"></tbody>
-      </table>
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h3>Расходы по категориям</h3>
+          <canvas id="chart"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Доходы и расходы</h3>
+          <canvas id="chartBar"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Тренд баланса</h3>
+          <canvas id="chartLine"></canvas>
+        </div>
+      </div>
     </div>
 
-    <div id="chartContainer">
-      <h3>📊 Расходы по категориям</h3>
-      <div class="chart-wrapper"><canvas id="chart"></canvas></div>
-    </div>
-
-    <div id="chartBarContainer">
-      <h3>📈 Доходы и расходы по месяцам</h3>
-      <div class="chart-wrapper"><canvas id="chartBar"></canvas></div>
+    <!-- Модальное окно редактирования -->
+    <div id="editModal" class="modal">
+      <div class="modal-content">
+        <h3>Редактировать транзакцию</h3>
+        <input id="editTitle" placeholder="Название" />
+        <input id="editAmount" type="number" placeholder="Сумма" />
+        <select id="editType">
+          <option value="income">Доход</option>
+          <option value="expense">Расход</option>
+        </select>
+        <select id="editCategory">
+          <option value="">Категория</option>
+          <option value="Зарплата">Зарплата</option>
+          <option value="Фриланс">Фриланс</option>
+          <option value="Еда">Еда</option>
+          <option value="Транспорт">Транспорт</option>
+          <option value="Развлечения">Развлечения</option>
+          <option value="Коммуналка">Коммуналка</option>
+          <option value="Здоровье">Здоровье</option>
+          <option value="Прочее">Прочее</option>
+        </select>
+        <input id="editDate" type="date" />
+        <div class="modal-buttons">
+          <button onclick="saveEdit()" class="btn-success">Сохранить</button>
+          <button onclick="closeModal()" class="btn-secondary">Отмена</button>
+        </div>
+      </div>
     </div>
 
     <script src="script.js"></script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("sw.js");
+        });
+      }
+    </script>
   </body>
 </html>
