@@ -143,3 +143,43 @@ canvas {
 #installBtn:hover {
   background: #1f7cc2;
 }
+
+/* === АДАПТИВНОСТЬ ДЛЯ МАЛЕНЬКИХ ЭКРАНОВ === */
+@media (max-width: 600px) {
+  /* Уменьшаем ширину основного контейнера */
+  .card {
+    width: 100%;
+    max-width: none;
+    padding: 10px;
+  }
+
+  /* Уменьшаем padding и размер шрифта для таблицы */
+  th,
+  td {
+    padding: 6px;
+    font-size: 14px;
+  }
+
+  /* Для маленьких экранов скрываем некоторые столбцы таблицы */
+  table thead th:nth-child(1), /* Дата */
+  table tbody td:nth-child(1) {
+    display: table-cell; /* Оставляем дату */
+  }
+
+  /* На очень маленьких экранах можно спрятать дату, но пока оставим */
+
+  /* Делаем поля ввода и кнопки немного компактнее */
+  input,
+  select,
+  button {
+    font-size: 14px;
+    padding: 10px; /* Увеличим высоту для удобства нажатия */
+  }
+
+  /* Обеспечиваем прокрутку для больших таблиц на мобильных устройствах */
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}

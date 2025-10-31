@@ -1,14 +1,14 @@
-const CACHE_NAME = "budget-planner-v6"; // Увеличена версия для принудительного обновления
+const CACHE_NAME = "budget-planner-v7"; // Увеличиваем версию для принудительного обновления кэша
 const urlsToCache = [
   "./",
   "./index.html",
   "./style.css",
   "./script.js",
   "./manifest.json",
-  // Иконки
+  // Обновлённые пути к JPEG иконкам
   "./icons/icon-192.jpg",
   "./icons/icon-512.jpg",
-  // Внешние библиотеки
+  // 🔥 ГЛАВНОЕ ИСПРАВЛЕНИЕ: Кэшируем Chart.js для работы офлайн
   "https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js",
 ];
 
@@ -29,7 +29,7 @@ self.addEventListener("activate", (event) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheName !== CACHE_NAME) {
-            console.log("SW: Удаление старого кэша:", cacheNameName);
+            console.log("SW: Удаление старого кэша:", cacheName);
             return caches.delete(cacheName);
           }
         })
@@ -46,6 +46,7 @@ self.addEventListener("fetch", (event) => {
         return response;
       }
       return fetch(event.request).catch(() => {
+        // Если запрос к сети не удался и это страница, можно вернуть офлайн-страницу
         if (event.request.mode === "navigate") {
           return caches.match("./index.html");
         }
